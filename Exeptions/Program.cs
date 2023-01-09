@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace _9._3
 {
     /// <summary>
-    /// Делегаты и их прктическое применение
+    /// Делегаты и их практическое применение
     /// </summary>
     public class Program
     {
