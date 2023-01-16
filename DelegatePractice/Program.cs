@@ -4,49 +4,113 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace DelegatePractice
 {
     public class Program
     {
 
-        public delegate int DelegateSum(int a, int b);
+        public delegate void Sort(List<Employee> employees, int flag);
+        public static event Sort SetSortFlag; // событие
 
         static void Main(string[] args)
         {
-            DelegateSum delegateSum = Sum.SumMethod;
-            int result = delegateSum(5, 6);
-            Console.WriteLine($"{result}");
 
-            int result2 = delegateSum.Invoke(5, 6);
-            Console.WriteLine($"{result2}");
-
-            DelegateSum delegateSum2 = (a, b) =>
+            Employee empl1 = new Employee()
             {
-                int returnValue = a - b;
-                return returnValue;
-
+                Name = "Алексей",
+                LastName  = "Иванов"
             };
-            Console.WriteLine($"{delegateSum2.Invoke(5, 6)}");
+
+            Employee empl2 = new Employee()
+            {
+                Name = "Иван",
+                LastName = "Афонин"
+            };
+
+            Employee empl3 = new Employee()
+            {
+                Name = "Михаил",
+                LastName = "Муромов"
+            };
+
+            Employee empl4 = new Employee()
+            {
+                Name = "Дмитрий",
+                LastName = "Ткаченко"
+            };
+
+            Employee empl5 = new Employee()
+            {
+                Name = "Степан",
+                LastName = "Химов"
+            };
+
+            List<Employee> lst = new List<Employee>();
+            lst.Add(empl1);
+            lst.Add(empl2);
+            lst.Add(empl3);
+            lst.Add(empl4);
+            lst.Add(empl5);
+
+            SetSortFlag += EmployeeSort;
+            SetSortFlag?.Invoke(lst, 2); //<-- ЗДЕСЬ МЕНЯЕМ ФЛАГ СОРТИРОВКИ. 
+
+        }
+
+        public static void EmployeeSort(List<Employee> listemployee, int sortFlag)
+        {
+            IOrderedEnumerable<Employee> l;
+            try
+            {
+                if (sortFlag == 1)
+                {
+                    l = listemployee.OrderBy(p => p.LastName);
+                    Console.WriteLine($"Сортировка списка Employee от А-Я:\n----------------------------------");
+                    ShowEmployeesList(l);
+                }
+                else
+                {
+                    l = listemployee.OrderByDescending(p => p.LastName);
+                    Console.WriteLine($"Сортировка списка Employee от Я-А:\n----------------------------------");
+                    ShowEmployeesList(l);
+                }
+            }
+            catch (Exception ex)
+            {
+                CustomException exc = new CustomException($"{ex.Message}");
+            }
             Console.ReadKey();
         }
-    }
 
-    public class Sum
-    {
-        public static int SumMethod(int a, int b)
+        public static void ShowEmployeesList(IOrderedEnumerable<Employee> l)
         {
-            int returnValue = a - b;
-            return returnValue;
+            foreach (var item in l)
+            {
+                Console.WriteLine($"{item.LastName} {item.Name}");
+            }
         }
+
     }
 
     public class Employee
     {
-        public int ID { get; set; }
         public string Name { get; set; }
-        public int Experience { get; set; }
-        public int Salary { get; set; }
-        public int Age { get; set; }
+        public string LastName { get; set; }
 
+        public Employee()
+        {
+
+        }
+    }
+
+    class CustomException : Exception
+    {
+        public CustomException(string message) : base(message)
+        {
+            Exception ownException = new Exception("Собственное исключение!");
+            Console.WriteLine($"Собственное сообщение: {ownException.Message}");
+            Console.ReadKey();
+        }
     }
 }
